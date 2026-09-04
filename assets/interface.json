@@ -3,13 +3,13 @@
     // 文档：https://maafw.xyz/docs/3.3-ProjectInterfaceV2
     "interface_version": 2,
     "name": "MaaPractice (第七史诗)",
-    "description": "第七史诗 (Epic Seven) 自动脚本：自动刷商店、领体力、收邮件、日常任务，支持一键日常。",
+    "description": "第七史诗 (Epic Seven) 自动脚本：自动刷商店、收邮件、日常任务，支持一键日常。",
     "contact": "QQ群: 123456789",
     "license": "MIT",
     "welcome": "欢迎使用第七史诗自动脚本！连接设备后选择任务开始。",
     // 填写项目地址和版本号可实现自动更新功能
     "github": "https://github.com/hunter951753/MaaPractice",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "controller": [
         {
             "name": "安卓端",
@@ -62,10 +62,6 @@
         {
             "name": "自动刷商店",
             "entry": "E7_Shop_Enter"
-        },
-        {
-            "name": "领商店体力",
-            "entry": "E7_Energy_Enter"
         },
         {
             "name": "收邮件",
