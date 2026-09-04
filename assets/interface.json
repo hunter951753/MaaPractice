@@ -4,13 +4,13 @@
     // 文档：https://maafw.xyz/docs/3.3-ProjectInterfaceV2
     // 示例：https://github.com/MaaXYZ/MaaFramework/blob/main/sample/interface.json
     "interface_version": 2,
-    "name": "MaaXXX",
-    "description": "这是一个使用 MaaFramework 创建的新项目。",
+    "name": "MaaPractice",
+    "description": "这是一个基于 MaaFramework 的练习项目，演示 OCR 识别、图像模板匹配与自定义 Agent 三类任务。",
     "contact": "QQ群: 123456789",
     "license": "MIT",
     "welcome": "首次使用！欢迎使用 MAA!",
     // 填写项目地址和版本号可实现自动更新功能
-    "github": "https://github.com/MaaXYZ/MaaPracticeBoilerplate",
+    "github": "https://github.com/hunter951753/MaaPractice",
     "version": "1.0.0",
     // Mirror酱为第三方分发服务，新项目默认关闭
     // 若有需要请联系 Mirror酱 开通，直接自行开启是无法使用的
@@ -51,36 +51,28 @@
             ]
         }
     ],
-    // 可选的 agent 示例
-    // "agent": {
-    //     "child_exec": "python",
-    //     "child_args": [
-    //         "./agent/main.py"
-    //     ]
-    // },
+    // 启用 agent 进程，承载自定义识别/动作模块（agent/my_reco.py、agent/my_action.py）
+    "agent": {
+        "child_exec": "python",
+        "child_args": [
+            "./agent/main.py"
+        ]
+    },
     "task": [
         {
-            "name": "普通任务",
-            "entry": "MyTask1"
+            "name": "开始任务",
+            "entry": "StartTask"
         },
         {
             "name": "选项任务",
-            "entry": "MyTask2",
+            "entry": "OcrTask",
             "option": [
                 "任务选项1"
             ]
         },
         {
-            "name": "参数任务",
-            "entry": "MyTask3",
-            "option": [
-                "任务选项1"
-            ],
-            "pipeline_override": {}
-        },
-        {
-            "name": "带Custom的任务",
-            "entry": "MyTask4"
+            "name": "自定义任务",
+            "entry": "CustomTask"
         }
     ],
     "option": {
@@ -88,18 +80,18 @@
             "type": "select",
             "cases": [
                 {
-                    "name": "文本1",
+                    "name": "识别文本1",
                     "pipeline_override": {
                         "OcrTask": {
-                            "text": "文本1"
+                            "expected": "文本1"
                         }
                     }
                 },
                 {
-                    "name": "文本2",
+                    "name": "识别文本2",
                     "pipeline_override": {
                         "OcrTask": {
-                            "text": "文本2"
+                            "expected": "文本2"
                         }
                     }
                 }
