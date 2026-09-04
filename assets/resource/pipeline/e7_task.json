@@ -277,6 +277,16 @@
             "E7_OneKey_Energy"
         ],
         "on_error": [
+            "E7_OneKey_MailBackFail"
+        ]
+    },
+    // 返回按钮识别不到也继续推进到下一项（避免卡死）
+    "E7_OneKey_MailBackFail": {
+        "recognition": "TemplateMatch",
+        "template": "empty.png",
+        "threshold": 0.5,
+        "action": "DoNothing",
+        "next": [
             "E7_OneKey_Energy"
         ]
     },
@@ -325,6 +335,16 @@
             "E7_OneKey_Daily"
         ],
         "on_error": [
+            "E7_OneKey_EnergyBackFail"
+        ]
+    },
+    // 返回失败也继续推进到下一项
+    "E7_OneKey_EnergyBackFail": {
+        "recognition": "TemplateMatch",
+        "template": "empty.png",
+        "threshold": 0.5,
+        "action": "DoNothing",
+        "next": [
             "E7_OneKey_Daily"
         ]
     },
@@ -361,6 +381,16 @@
             "E7_OneKey_Shop"
         ],
         "on_error": [
+            "E7_OneKey_DailyBackFail"
+        ]
+    },
+    // 返回失败也继续推进到自动刷商店
+    "E7_OneKey_DailyBackFail": {
+        "recognition": "TemplateMatch",
+        "template": "empty.png",
+        "threshold": 0.5,
+        "action": "DoNothing",
+        "next": [
             "E7_OneKey_Shop"
         ]
     },
