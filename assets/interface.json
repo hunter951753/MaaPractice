@@ -9,7 +9,7 @@
     "welcome": "欢迎使用第七史诗自动脚本！连接设备后选择任务开始。",
     // 填写项目地址和版本号可实现自动更新功能
     "github": "https://github.com/hunter951753/MaaPractice",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "controller": [
         {
             "name": "安卓端",
@@ -20,13 +20,16 @@
             "name": "桌面端",
             "type": "Win32",
             "win32": {
-                "class_regex": ".*",
-                "window_regex": "Visual Studio",
-                // 截图及控制方式，请根据项目实际情况修改
+                // 第七史诗 PC 客户端（STOVE 版）窗口匹配
+                "class_regex": "GLFW30",
+                "window_regex": ".*第七史诗.*",
+                // 截图方式：实测 GDI 可正常截取游戏画面（PrintWindow 对 GPU 渲染窗口为黑屏）
                 // 文档: https://maafw.xyz/docs/2.4-ControlMethods
-                "screencap": "PrintWindow", // 截图方式
-                "mouse": "PostMessageWithCursorPos", // 鼠标控制方式
-                "keyboard": "PostMessageWithCursorPos" // 键盘控制方式
+                "screencap": "GDI",
+                // 鼠标用 PostMessage（直接携带窗口坐标发送，无需移动光标；
+                // PostMessageWithCursorPos 需 SetCursorPos 移动光标，部分环境下受限）
+                "mouse": "PostMessage",
+                "keyboard": "PostMessage" // 键盘控制方式
             }
         }
     ],
