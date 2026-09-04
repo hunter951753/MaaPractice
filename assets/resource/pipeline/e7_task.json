@@ -1,0 +1,380 @@
+{
+    // ============================================================
+    // 第七史诗 (Epic Seven / E7) 自动脚本
+    // 框架：MaaFramework v5  |  协议参考：https://maafw.com/docs/3.1-任务流水线协议
+    //
+    // 识别方式：
+    //   - 以 OCR 文字识别为主，直接识别游戏内中文按钮（商店/刷新/确认/购买/接收/领取 等）
+    //   - 模板匹配为辅，mysticLocation.png / covenantLocation.png 为占位图，
+    //     需替换为真实游戏截图（路径：assets/resource/image/ 下同名文件）
+    //
+    // 功能：
+    //   1. E7_Shop_Enter  自动刷商店：刷新商店 -> 买神秘召唤 -> 买圣约召唤 -> 循环
+    //   2. E7_Energy_Enter 领商店体力
+    //   3. E7_Mail_Enter   收邮件（全部接收）
+    //   4. E7_Daily_Enter  日常任务领取
+    //   5. E7_OneKey       一键日常：顺序执行上述功能，某项找不到时自动跳到下一项
+    //
+    // 说明：本脚本需连接安卓模拟器/设备（开启 ADB）后运行；
+    //       各环节识别文字/按钮坐标若与你的游戏版本不符，按需微调即可。
+    // ============================================================
+
+    // ---------- 通用：返回/关闭 ----------
+    "E7_Back": {
+        "recognition": "OCR",
+        "expected": "返回",
+        "action": "Click"
+    },
+    "E7_Close": {
+        "recognition": "TemplateMatch",
+        "template": "close_icon.png",
+        "threshold": 0.7,
+        "action": "Click"
+    },
+
+    // ========== 功能 1：自动刷商店 ==========
+    // 主界面识别"商店"并进入
+    "E7_Shop_Enter": {
+        "recognition": "OCR",
+        "expected": "商店",
+        "action": "Click",
+        "next": [
+            "E7_Shop_Refresh"
+        ]
+    },
+    // 点击"刷新"按钮
+    "E7_Shop_Refresh": {
+        "recognition": "OCR",
+        "expected": "刷新",
+        "action": "Click",
+        "rate_limit": 2000,
+        "next": [
+            "E7_Shop_ConfirmRefresh"
+        ]
+    },
+    // 刷新确认弹窗，点击"确认"
+    "E7_Shop_ConfirmRefresh": {
+        "recognition": "OCR",
+        "expected": "确认",
+        "action": "Click",
+        "timeout": 10000,
+        "next": [
+            "E7_Shop_BuyMystic"
+        ]
+    },
+    // 点击"神秘召唤"栏位（模板占位图，需替换为真实截图）
+    "E7_Shop_BuyMystic": {
+        "recognition": "TemplateMatch",
+        "template": "mysticLocation.png",
+        "threshold": 0.7,
+        "timeout": 15000,
+        "action": "Click",
+        "next": [
+            "E7_Shop_Buy"
+        ]
+    },
+    // 点击"购买"按钮
+    "E7_Shop_Buy": {
+        "recognition": "OCR",
+        "expected": "购买",
+        "action": "Click",
+        "next": [
+            "E7_Shop_ConfirmBuy"
+        ]
+    },
+    // 购买确认弹窗，点击"确认"
+    "E7_Shop_ConfirmBuy": {
+        "recognition": "OCR",
+        "expected": "确认",
+        "action": "Click",
+        "timeout": 10000,
+        "next": [
+            "E7_Shop_BuyCovenant"
+        ]
+    },
+    // 点击"圣约召唤"栏位（模板占位图，需替换为真实截图）
+    "E7_Shop_BuyCovenant": {
+        "recognition": "TemplateMatch",
+        "template": "covenantLocation.png",
+        "threshold": 0.7,
+        "timeout": 15000,
+        "action": "Click",
+        "next": [
+            "E7_Shop_Buy2"
+        ]
+    },
+    "E7_Shop_Buy2": {
+        "recognition": "OCR",
+        "expected": "购买",
+        "action": "Click",
+        "next": [
+            "E7_Shop_ConfirmBuy2"
+        ]
+    },
+    "E7_Shop_ConfirmBuy2": {
+        "recognition": "OCR",
+        "expected": "确认",
+        "action": "Click",
+        "timeout": 10000,
+        "next": [
+            // 循环：回到"刷新"，再次刷新商店（由用户在界面手动停止）
+            "E7_Shop_Refresh"
+        ]
+    },
+
+    // ========== 功能 2：领商店体力 ==========
+    "E7_Energy_Enter": {
+        "recognition": "OCR",
+        "expected": "商店",
+        "action": "Click",
+        "next": [
+            "E7_Energy_Item"
+        ]
+    },
+    // 依次点击商店里的"体力"栏位
+    "E7_Energy_Item": {
+        "recognition": "OCR",
+        "expected": "体力",
+        "action": "Click",
+        "timeout": 10000,
+        "next": [
+            "E7_Energy_Receive"
+        ],
+        "on_error": [
+            // 没有更多体力栏位了，返回主界面
+            "E7_Energy_Back"
+        ]
+    },
+    "E7_Energy_Receive": {
+        "recognition": "OCR",
+        "expected": "接收",
+        "action": "Click",
+        "timeout": 10000,
+        "next": [
+            "E7_Energy_Item"
+        ]
+    },
+    "E7_Energy_Back": {
+        "recognition": "OCR",
+        "expected": "返回",
+        "action": "Click",
+        "next": [
+            "E7_Energy_Done"
+        ]
+    },
+    "E7_Energy_Done": {
+        "action": "DoNothing"
+    },
+
+    // ========== 功能 3：收邮件 ==========
+    "E7_Mail_Enter": {
+        "recognition": "OCR",
+        "expected": "邮件",
+        "action": "Click",
+        "next": [
+            "E7_Mail_Receive"
+        ]
+    },
+    "E7_Mail_Receive": {
+        "recognition": "OCR",
+        "expected": "接收",
+        "action": "Click",
+        "next": [
+            "E7_Mail_ReceiveAll"
+        ]
+    },
+    "E7_Mail_ReceiveAll": {
+        "recognition": "OCR",
+        "expected": "全部",
+        "action": "Click",
+        "next": [
+            "E7_Mail_Back"
+        ]
+    },
+    "E7_Mail_Back": {
+        "recognition": "OCR",
+        "expected": "返回",
+        "action": "Click",
+        "next": [
+            "E7_Mail_Done"
+        ]
+    },
+    "E7_Mail_Done": {
+        "action": "DoNothing"
+    },
+
+    // ========== 功能 4：日常任务/签到 ==========
+    "E7_Daily_Enter": {
+        "recognition": "OCR",
+        "expected": "日常",
+        "action": "Click",
+        "next": [
+            "E7_Daily_Claim"
+        ]
+    },
+    "E7_Daily_Claim": {
+        "recognition": "OCR",
+        "expected": "领取",
+        "action": "Click",
+        "next": [
+            "E7_Daily_Back"
+        ]
+    },
+    "E7_Daily_Back": {
+        "recognition": "OCR",
+        "expected": "返回",
+        "action": "Click",
+        "next": [
+            "E7_Daily_Done"
+        ]
+    },
+    "E7_Daily_Done": {
+        "action": "DoNothing"
+    },
+
+    // ========== 功能 5：一键日常 ==========
+    // 顺序执行：收邮件 -> 领体力 -> 日常 -> 自动刷商店
+    // 任一环节找不到目标（on_error）则自动跳到下一项，避免卡死
+    "E7_OneKey": {
+        "recognition": "TemplateMatch",
+        "template": "empty.png",
+        "threshold": 0.5,
+        "action": "DoNothing",
+        "next": [
+            "E7_OneKey_Mail"
+        ]
+    },
+    "E7_OneKey_Mail": {
+        "recognition": "OCR",
+        "expected": "邮件",
+        "action": "Click",
+        "timeout": 5000,
+        "next": [
+            "E7_OneKey_MailReceive"
+        ],
+        "on_error": [
+            "E7_OneKey_Energy"
+        ]
+    },
+    "E7_OneKey_MailReceive": {
+        "recognition": "OCR",
+        "expected": "全部",
+        "action": "Click",
+        "timeout": 5000,
+        "next": [
+            "E7_OneKey_MailBack"
+        ],
+        "on_error": [
+            "E7_OneKey_Energy"
+        ]
+    },
+    "E7_OneKey_MailBack": {
+        "recognition": "OCR",
+        "expected": "返回",
+        "action": "Click",
+        "timeout": 5000,
+        "next": [
+            "E7_OneKey_Energy"
+        ],
+        "on_error": [
+            "E7_OneKey_Energy"
+        ]
+    },
+    "E7_OneKey_Energy": {
+        "recognition": "OCR",
+        "expected": "商店",
+        "action": "Click",
+        "timeout": 5000,
+        "next": [
+            "E7_OneKey_EnergyItem"
+        ],
+        "on_error": [
+            "E7_OneKey_Daily"
+        ]
+    },
+    "E7_OneKey_EnergyItem": {
+        "recognition": "OCR",
+        "expected": "体力",
+        "action": "Click",
+        "timeout": 5000,
+        "next": [
+            "E7_OneKey_EnergyReceive"
+        ],
+        "on_error": [
+            "E7_OneKey_Daily"
+        ]
+    },
+    "E7_OneKey_EnergyReceive": {
+        "recognition": "OCR",
+        "expected": "接收",
+        "action": "Click",
+        "timeout": 5000,
+        "next": [
+            "E7_OneKey_EnergyBack"
+        ],
+        "on_error": [
+            "E7_OneKey_Daily"
+        ]
+    },
+    "E7_OneKey_EnergyBack": {
+        "recognition": "OCR",
+        "expected": "返回",
+        "action": "Click",
+        "timeout": 5000,
+        "next": [
+            "E7_OneKey_Daily"
+        ],
+        "on_error": [
+            "E7_OneKey_Daily"
+        ]
+    },
+    "E7_OneKey_Daily": {
+        "recognition": "OCR",
+        "expected": "日常",
+        "action": "Click",
+        "timeout": 5000,
+        "next": [
+            "E7_OneKey_DailyClaim"
+        ],
+        "on_error": [
+            "E7_OneKey_Shop"
+        ]
+    },
+    "E7_OneKey_DailyClaim": {
+        "recognition": "OCR",
+        "expected": "领取",
+        "action": "Click",
+        "timeout": 5000,
+        "next": [
+            "E7_OneKey_DailyBack"
+        ],
+        "on_error": [
+            "E7_OneKey_Shop"
+        ]
+    },
+    "E7_OneKey_DailyBack": {
+        "recognition": "OCR",
+        "expected": "返回",
+        "action": "Click",
+        "timeout": 5000,
+        "next": [
+            "E7_OneKey_Shop"
+        ],
+        "on_error": [
+            "E7_OneKey_Shop"
+        ]
+    },
+    // 进入商店后交给自动刷商店循环
+    "E7_OneKey_Shop": {
+        "recognition": "OCR",
+        "expected": "商店",
+        "action": "Click",
+        "timeout": 5000,
+        "next": [
+            "E7_Shop_Refresh"
+        ],
+        "on_error": [
+            "E7_Shop_Enter"
+        ]
+    }
+}
